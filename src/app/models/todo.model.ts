@@ -5,4 +5,5 @@ export interface Todo {
     dueDate: Date | null;
     hasNotification: boolean;
     priority?: 'high' | 'medium' | 'low';
+    categories?: string[];
 }

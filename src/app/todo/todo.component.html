@@ -51,6 +51,20 @@
             </div>
           </div>
         </div>
+
+        <!-- Category Selection -->
+        <div class="category-selection">
+          <label>Kategorien:</label>
+          <div class="category-chips">
+            <div 
+              *ngFor="let category of availableCategories" 
+              class="category-chip" 
+              [class.selected]="isCategorySelected(category)"
+              (click)="toggleCategory(category)">
+              {{ category }}
+            </div>
+          </div>
+        </div>
       </div>
     </form>
   </div>
@@ -81,6 +95,23 @@
     </div>
   </div>
 
+  <!-- Category Filter -->
+  <div class="category-filter">
+    <button 
+      class="category-filter-chip" 
+      [class.active]="categoryFilter === null"
+      (click)="filterByCategory(null)">
+      Alle Kategorien
+    </button>
+    <button 
+      *ngFor="let category of availableCategories" 
+      class="category-filter-chip"
+      [class.active]="categoryFilter === category"
+      (click)="filterByCategory(category)">
+      {{ category }}
+    </button>
+  </div>
+
   <!-- Todos List -->
   <div class="trello-board" *ngIf="todos.length > 0">
     <div class="card-container">
@@ -95,6 +126,31 @@
         
         <div class="card-content">
           <p [class.completed]="todo.completed">{{ todo.title }}</p>
+          
+          <!-- Categories Display -->
+          <div class="todo-categories" *ngIf="todo.categories && todo.categories.length">
+            <div class="categories-container">
+              <div 
+                *ngFor="let cat of todo.categories" 
+                class="category-badge">
+                {{ cat }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Editor -->
+          <div class="category-editor">
+            <label>Kategorien bearbeiten:</label>
+            <div class="edit-category-chips">
+              <div 
+                *ngFor="let category of availableCategories" 
+                class="category-chip small" 
+                [class.selected]="hasTodoCategory(todo, category)"
+                (click)="toggleTodoCategory(todo, category)">
+                {{ category }}
+              </div>
+            </div>
+          </div>
           
           <!-- Due Date and Notification Controls -->
           <div class="due-date-notification-container" *ngIf="todo.dueDate">
