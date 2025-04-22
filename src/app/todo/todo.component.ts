@@ -1,24 +1,7 @@
 import { Component, OnInit, DoCheck, Inject, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-<<<<<<< HEAD
 import { Todo } from '../models/todo.model';
-=======
-
-// Enum für Prioritätsstufen
-export enum Priority {
-  Low = 'low',
-  Medium = 'medium',
-  High = 'high'
-}
-
-interface Todo {
-  id: number;
-  title: string;
-  completed: boolean;
-  priority: Priority;
-}
->>>>>>> main
 
 @Component({
   selector: 'app-todo',
@@ -31,18 +14,11 @@ export class TodoComponent implements OnInit, DoCheck {
   todos: Todo[] = [];
   newTodo: string = '';
   filter: string = 'all';
-<<<<<<< HEAD
   newTodoDueDate: string | null = null;
   newTodoHasNotification: boolean = false;
   public isBrowser: boolean;
   notificationPermissionGranted: boolean = false;
-=======
-  private isBrowser: boolean;
-  // Prioritäten verfügbar machen
-  priorities = Priority;
-  newTodoPriority: Priority = Priority.Medium;
->>>>>>> main
-
+  
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
@@ -88,17 +64,12 @@ export class TodoComponent implements OnInit, DoCheck {
         id: Date.now(),
         title: this.newTodo.trim(),
         completed: false,
-<<<<<<< HEAD
         dueDate: dueDate,
         hasNotification: dueDate !== null && this.newTodoHasNotification
-=======
-        priority: this.newTodoPriority
->>>>>>> main
       };
 
       this.todos.push(todo);
       this.newTodo = '';
-<<<<<<< HEAD
       this.newTodoDueDate = null;
       this.newTodoHasNotification = false;
       
@@ -110,22 +81,6 @@ export class TodoComponent implements OnInit, DoCheck {
   }
 
   removeTodo(id: number) {
-=======
-      // Priorität standardmäßig nach dem Hinzufügen zurücksetzen
-      this.newTodoPriority = Priority.Medium;
-    }
-  }
-
-  changeTodoPriority(todo: Todo, priority: Priority): void {
-    todo.priority = priority;
-  }
-
-  get openTodosCount(): number {
-    return this.todos.filter(todo => !todo.completed).length;
-  }
-
-  removeTodo(id: number): void {
->>>>>>> main
     this.todos = this.todos.filter(todo => todo.id !== id);
   }
 
@@ -256,13 +211,8 @@ export class TodoComponent implements OnInit, DoCheck {
     this.todos = this.todos.filter(todo => !todo.completed);
   }
   
-<<<<<<< HEAD
   changeFilter(filterType: string): void {
     this.filterTodos(filterType);
-=======
-  hasCompletedTodos(): boolean {
-    return this.todos.some(t => t.completed);
->>>>>>> main
   }
   
   filteredTodos(): Todo[] {
@@ -278,14 +228,5 @@ export class TodoComponent implements OnInit, DoCheck {
       this.updateTodoDueDate(todo, null);
     }
   }
-  
-  // Hilfsmethode, um den Prioritätstext zu bekommen
-  getPriorityText(priority: Priority): string {
-    switch(priority) {
-      case Priority.Low: return 'Niedrig';
-      case Priority.Medium: return 'Mittel';
-      case Priority.High: return 'Hoch';
-      default: return '';
-    }
-  }
 }
+

@@ -2,7 +2,7 @@
   <div class="todo-header">
     <h1>Meine Aufgaben</h1>
   </div>
-  
+
   <!-- Add Task Section -->
   <div class="add-task-section">
     <form (ngSubmit)="addTodo()">
@@ -17,29 +17,39 @@
       </div>
       
       <div class="task-options">
-        <div class="date-option">
-          <label for="dueDate">Fälligkeitsdatum:</label>
-          <input 
-            type="datetime-local" 
-            id="dueDate" 
-            [(ngModel)]="newTodoDueDate" 
-            name="dueDate">
-        </div>
-        
-        <div class="notification-option">
-          <label for="notification">Benachrichtigung:</label>
-          <input 
-            type="checkbox" 
-            id="notification" 
-            [(ngModel)]="newTodoHasNotification" 
-            name="notification"
-            [disabled]="!newTodoDueDate">
-          <button 
-            *ngIf="isBrowser && !notificationPermissionGranted" 
-            (click)="requestNotificationPermission()" 
-            type="button">
-            Benachrichtigungen erlauben
-          </button>
+        <div class="date-notification-row">
+          <div class="date-option">
+            <label for="dueDate">Fälligkeitsdatum:</label>
+            <input 
+              type="datetime-local" 
+              id="dueDate" 
+              [(ngModel)]="newTodoDueDate" 
+              name="dueDate"
+              class="modern-date-input">
+          </div>
+          
+          <div class="notification-option">
+            <label for="notification">
+              <i class="notification-icon">🔔</i>
+              Benachrichtigung:
+            </label>
+            <div class="notification-controls">
+              <input 
+                type="checkbox" 
+                id="notification" 
+                [(ngModel)]="newTodoHasNotification" 
+                name="notification"
+                [disabled]="!newTodoDueDate"
+                class="notification-checkbox">
+              <button 
+                *ngIf="isBrowser && !notificationPermissionGranted" 
+                (click)="requestNotificationPermission()" 
+                type="button"
+                class="notification-permission-btn">
+                Benachrichtigungen erlauben
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </form>
@@ -70,7 +80,6 @@
       </button>
     </div>
   </div>
-<<<<<<< HEAD
 
   <!-- Todos List -->
   <div class="trello-board" *ngIf="todos.length > 0">
@@ -87,28 +96,34 @@
         <div class="card-content">
           <p [class.completed]="todo.completed">{{ todo.title }}</p>
           
-          <!-- Due Date Display -->
-          <div *ngIf="todo.dueDate" class="due-date" [class.overdue]="isOverdue(todo)">
-            <p>Fällig am: {{ formatDate(todo.dueDate) }}</p>
-            <div class="date-controls">
-              <input 
-                type="datetime-local" 
-                [ngModel]="todo.dueDate | date:'yyyy-MM-ddTHH:mm'" 
-                (ngModelChange)="updateDueDate(todo)"
-                name="todoDate">
+          <!-- Due Date and Notification Controls -->
+          <div class="due-date-notification-container" *ngIf="todo.dueDate">
+            <div class="due-date" [class.overdue]="isOverdue(todo)">
+              <span class="due-date-label">Fällig am:</span>
+              <span class="due-date-value">{{ formatDate(todo.dueDate) }}</span>
+              <div class="date-controls">
+                <input 
+                  type="datetime-local" 
+                  [ngModel]="todo.dueDate | date:'yyyy-MM-ddTHH:mm'" 
+                  (ngModelChange)="updateDueDate(todo)"
+                  name="todoDate"
+                  class="modern-date-input">
+              </div>
             </div>
-          </div>
-          
-          <!-- Notification Toggle -->
-          <div class="notification-toggle" *ngIf="isBrowser">
-            <label>
-              <input 
-                type="checkbox" 
-                [checked]="todo.hasNotification" 
-                (change)="toggleNotification(todo)"
-                [disabled]="!todo.dueDate">
-              Benachrichtigung
-            </label>
+            
+            <!-- Notification Toggle -->
+            <div class="notification-toggle" *ngIf="isBrowser">
+              <label class="notification-label">
+                <i class="notification-icon">🔔</i>
+                <input 
+                  type="checkbox" 
+                  [checked]="todo.hasNotification" 
+                  (change)="toggleNotification(todo)"
+                  [disabled]="!todo.dueDate"
+                  class="notification-checkbox">
+                <span>Benachrichtigung</span>
+              </label>
+            </div>
           </div>
         </div>
         
@@ -117,105 +132,6 @@
             {{ todo.completed ? 'Wiederherstellen' : 'Als erledigt markieren' }}
           </button>
         </div>
-=======
-  
-  <div class="input-container">
-    <div class="input-group">
-      <input
-        type="text"
-        [(ngModel)]="newTodo"
-        placeholder="Neue Aufgabe hinzufügen..."
-        (keyup.enter)="addTodo()"
-      />
-      <button (click)="addTodo()">Hinzufügen</button>
-    </div>
-    
-    <div class="priority-selector">
-      <span class="priority-label">Priorität:</span>
-      <div class="priority-buttons">
-        <button 
-          class="priority-btn priority-low" 
-          [class.active]="newTodoPriority === priorities.Low"
-          (click)="newTodoPriority = priorities.Low">
-          Niedrig
-        </button>
-        <button 
-          class="priority-btn priority-medium" 
-          [class.active]="newTodoPriority === priorities.Medium"
-          (click)="newTodoPriority = priorities.Medium">
-          Mittel
-        </button>
-        <button 
-          class="priority-btn priority-high" 
-          [class.active]="newTodoPriority === priorities.High"
-          (click)="newTodoPriority = priorities.High">
-          Hoch
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <div class="todo-status">
-    <p>{{ openTodosCount }} Aufgabe(n) offen</p>
-    
-    <button class="clear-btn" (click)="clearCompletedTodos()" *ngIf="hasCompletedTodos()">
-      Erledigte löschen
-    </button>
-  </div>
-</div>
-
-<div class="trello-board">
-  <div class="card-container">
-    <div class="trello-card" 
-         *ngFor="let todo of filteredTodos()" 
-         [class.completed-card]="todo.completed"
-         [class.priority-low]="todo.priority === priorities.Low"
-         [class.priority-medium]="todo.priority === priorities.Medium"
-         [class.priority-high]="todo.priority === priorities.High">
-      <div class="card-header" [class.completed]="todo.completed">
-        <div class="completion-status">
-          <span class="status-indicator" [class.done]="todo.completed"></span>
-          <span class="status-text">{{ todo.completed ? 'Erledigt' : 'Offen' }}</span>
-        </div>
-        <div class="priority-badge" [ngClass]="'priority-' + todo.priority">
-          {{ getPriorityText(todo.priority) }}
-        </div>
-        <button class="delete-btn" (click)="removeTodo(todo.id)" title="Löschen">🗑️</button>
-      </div>
-      
-      <div class="card-content">
-        <p [class.completed]="todo.completed">{{ todo.title }}</p>
-      </div>
-      
-      <div class="card-footer">
-        <div class="priority-changer">
-          <button 
-            class="mini-priority-btn priority-low" 
-            [class.active]="todo.priority === priorities.Low"
-            (click)="changeTodoPriority(todo, priorities.Low)"
-            title="Niedrige Priorität">
-            L
-          </button>
-          <button 
-            class="mini-priority-btn priority-medium" 
-            [class.active]="todo.priority === priorities.Medium"
-            (click)="changeTodoPriority(todo, priorities.Medium)"
-            title="Mittlere Priorität">
-            M
-          </button>
-          <button 
-            class="mini-priority-btn priority-high" 
-            [class.active]="todo.priority === priorities.High"
-            (click)="changeTodoPriority(todo, priorities.High)"
-            title="Hohe Priorität">
-            H
-          </button>
-        </div>
-        <button class="toggle-btn" (click)="toggleTodoCompletion(todo)">
-          <span *ngIf="todo.completed">↩️ Wiederherstellen</span>
-          <span *ngIf="!todo.completed">✓ Als erledigt markieren</span>
-        </button>
->>>>>>> main
       </div>
     </div>
   </div>
