@@ -16,8 +16,13 @@ export class TodoComponent implements OnInit, DoCheck {
   filter: string = 'all';
   newTodoDueDate: string | null = null;
   newTodoHasNotification: boolean = false;
+  newTodoCategories: string[] = [];
   public isBrowser: boolean;
   notificationPermissionGranted: boolean = false;
+  
+  // Predefined categories that users can choose from
+  availableCategories: string[] = ['Arbeit', 'Privat', 'Einkaufen', 'Finanzen', 'Gesundheit', 'Hobby'];
+  categoryFilter: string | null = null;
   
   constructor(@Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -65,13 +70,15 @@ export class TodoComponent implements OnInit, DoCheck {
         title: this.newTodo.trim(),
         completed: false,
         dueDate: dueDate,
-        hasNotification: dueDate !== null && this.newTodoHasNotification
+        hasNotification: dueDate !== null && this.newTodoHasNotification,
+        categories: this.newTodoCategories.length > 0 ? [...this.newTodoCategories] : undefined
       };
 
       this.todos.push(todo);
       this.newTodo = '';
       this.newTodoDueDate = null;
       this.newTodoHasNotification = false;
+      this.newTodoCategories = [];
       
       // Schedule notification if needed
       if (this.isBrowser && todo.hasNotification && todo.dueDate) {
@@ -193,13 +200,23 @@ export class TodoComponent implements OnInit, DoCheck {
   }
 
   getFilteredTodos(): Todo[] {
-    if (this.filter === 'all') {
-      return this.todos;
-    } else if (this.filter === 'active') {
-      return this.todos.filter(todo => !todo.completed);
-    } else {
-      return this.todos.filter(todo => todo.completed);
+    let filtered = this.todos;
+
+    // Apply completed/active filter
+    if (this.filter === 'active') {
+      filtered = filtered.filter(todo => !todo.completed);
+    } else if (this.filter === 'done') {
+      filtered = filtered.filter(todo => todo.completed);
     }
+
+    // Apply category filter if set
+    if (this.categoryFilter) {
+      filtered = filtered.filter(todo => 
+        todo.categories && todo.categories.includes(this.categoryFilter!)
+      );
+    }
+
+    return filtered;
   }
   
   // For template compatibility
@@ -227,6 +244,50 @@ export class TodoComponent implements OnInit, DoCheck {
     } else {
       this.updateTodoDueDate(todo, null);
     }
+  }
+
+  // Toggle category selection for new todo
+  toggleCategory(category: string): void {
+    const index = this.newTodoCategories.indexOf(category);
+    if (index === -1) {
+      this.newTodoCategories.push(category);
+    } else {
+      this.newTodoCategories.splice(index, 1);
+    }
+  }
+
+  // Check if a category is selected
+  isCategorySelected(category: string): boolean {
+    return this.newTodoCategories.includes(category);
+  }
+
+  // Toggle category for existing todo
+  toggleTodoCategory(todo: Todo, category: string): void {
+    if (!todo.categories) {
+      todo.categories = [];
+    }
+
+    const index = todo.categories.indexOf(category);
+    if (index === -1) {
+      todo.categories.push(category);
+    } else {
+      todo.categories.splice(index, 1);
+    }
+
+    // Remove the categories array if it's empty
+    if (todo.categories.length === 0) {
+      todo.categories = undefined;
+    }
+  }
+
+  // Check if a todo has a specific category
+  hasTodoCategory(todo: Todo, category: string): boolean {
+    return todo.categories?.includes(category) || false;
+  }
+
+  // Filter todos by category
+  filterByCategory(category: string | null): void {
+    this.categoryFilter = category;
   }
 }
 
