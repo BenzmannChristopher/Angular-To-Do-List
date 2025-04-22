@@ -6,4 +6,11 @@ export interface Todo {
     hasNotification: boolean;
     priority?: 'high' | 'medium' | 'low';
     category?: string;
+    subtasks?: Subtask[];
+}
+
+export interface Subtask {
+    id: number;
+    title: string;
+    completed: boolean;
 }

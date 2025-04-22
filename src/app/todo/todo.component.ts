@@ -1,7 +1,7 @@
 import { Component, OnInit, DoCheck, Inject, PLATFORM_ID } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Todo } from '../models/todo.model';
+import { Todo, Subtask } from '../models/todo.model';
 
 @Component({
   selector: 'app-todo',
@@ -71,7 +71,8 @@ export class TodoComponent implements OnInit, DoCheck {
         completed: false,
         dueDate: dueDate,
         hasNotification: dueDate !== null && this.newTodoHasNotification,
-        category: this.newTodoCategory || undefined
+        category: this.newTodoCategory || undefined,
+        subtasks: []
       };
 
       this.todos.push(todo);
@@ -95,6 +96,13 @@ export class TodoComponent implements OnInit, DoCheck {
     const todo = this.todos.find(todo => todo.id === id);
     if (todo) {
       todo.completed = !todo.completed;
+      
+      // If todo has subtasks, set all subtasks to the same completion status
+      if (todo.subtasks && todo.subtasks.length > 0) {
+        todo.subtasks.forEach(subtask => {
+          subtask.completed = todo.completed;
+        });
+      }
     }
   }
 
@@ -288,6 +296,62 @@ export class TodoComponent implements OnInit, DoCheck {
     } else {
       return this.todos.filter(todo => todo.priority === priority);
     }
+  }
+
+  // Subtask methods
+  addSubtask(todo: Todo, subtaskText: string) {
+    if (subtaskText.trim() !== '') {
+      if (!todo.subtasks) {
+        todo.subtasks = [];
+      }
+      
+      const subtask: Subtask = {
+        id: Date.now(),
+        title: subtaskText.trim(),
+        completed: false
+      };
+      
+      todo.subtasks.push(subtask);
+    }
+  }
+  
+  removeSubtask(todo: Todo, subtaskId: number) {
+    if (todo.subtasks) {
+      todo.subtasks = todo.subtasks.filter(subtask => subtask.id !== subtaskId);
+    }
+  }
+  
+  toggleSubtaskCompleted(todo: Todo, subtaskId: number) {
+    if (todo.subtasks) {
+      const subtask = todo.subtasks.find(subtask => subtask.id === subtaskId);
+      if (subtask) {
+        subtask.completed = !subtask.completed;
+        
+        // Check if all subtasks are completed and update the main task status if needed
+        this.updateTaskCompletionStatus(todo);
+      }
+    }
+  }
+  
+  updateTaskCompletionStatus(todo: Todo) {
+    if (todo.subtasks && todo.subtasks.length > 0) {
+      // Set task as completed only if all subtasks are completed
+      todo.completed = todo.subtasks.every(subtask => subtask.completed);
+    }
+  }
+  
+  getCompletedSubtasksCount(todo: Todo): number {
+    if (!todo.subtasks || todo.subtasks.length === 0) {
+      return 0;
+    }
+    return todo.subtasks.filter(subtask => subtask.completed).length;
+  }
+  
+  getSubtasksProgress(todo: Todo): number {
+    if (!todo.subtasks || todo.subtasks.length === 0) {
+      return 0;
+    }
+    return Math.round((this.getCompletedSubtasksCount(todo) / todo.subtasks.length) * 100);
   }
 }
 
