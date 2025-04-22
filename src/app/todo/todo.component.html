@@ -9,14 +9,40 @@
     </div>
   </div>
   
-  <div class="input-group">
-    <input
-      type="text"
-      [(ngModel)]="newTodo"
-      placeholder="Neue Aufgabe hinzufügen..."
-      (keyup.enter)="addTodo()"
-    />
-    <button (click)="addTodo()">Hinzufügen</button>
+  <div class="input-container">
+    <div class="input-group">
+      <input
+        type="text"
+        [(ngModel)]="newTodo"
+        placeholder="Neue Aufgabe hinzufügen..."
+        (keyup.enter)="addTodo()"
+      />
+      <button (click)="addTodo()">Hinzufügen</button>
+    </div>
+    
+    <div class="priority-selector">
+      <span class="priority-label">Priorität:</span>
+      <div class="priority-buttons">
+        <button 
+          class="priority-btn priority-low" 
+          [class.active]="newTodoPriority === priorities.Low"
+          (click)="newTodoPriority = priorities.Low">
+          Niedrig
+        </button>
+        <button 
+          class="priority-btn priority-medium" 
+          [class.active]="newTodoPriority === priorities.Medium"
+          (click)="newTodoPriority = priorities.Medium">
+          Mittel
+        </button>
+        <button 
+          class="priority-btn priority-high" 
+          [class.active]="newTodoPriority === priorities.High"
+          (click)="newTodoPriority = priorities.High">
+          Hoch
+        </button>
+      </div>
+    </div>
   </div>
   
   <div class="todo-status">
@@ -30,11 +56,19 @@
 
 <div class="trello-board">
   <div class="card-container">
-    <div class="trello-card" *ngFor="let todo of filteredTodos()" [class.completed-card]="todo.completed">
+    <div class="trello-card" 
+         *ngFor="let todo of filteredTodos()" 
+         [class.completed-card]="todo.completed"
+         [class.priority-low]="todo.priority === priorities.Low"
+         [class.priority-medium]="todo.priority === priorities.Medium"
+         [class.priority-high]="todo.priority === priorities.High">
       <div class="card-header" [class.completed]="todo.completed">
         <div class="completion-status">
           <span class="status-indicator" [class.done]="todo.completed"></span>
           <span class="status-text">{{ todo.completed ? 'Erledigt' : 'Offen' }}</span>
+        </div>
+        <div class="priority-badge" [ngClass]="'priority-' + todo.priority">
+          {{ getPriorityText(todo.priority) }}
         </div>
         <button class="delete-btn" (click)="removeTodo(todo.id)" title="Löschen">🗑️</button>
       </div>
@@ -44,6 +78,29 @@
       </div>
       
       <div class="card-footer">
+        <div class="priority-changer">
+          <button 
+            class="mini-priority-btn priority-low" 
+            [class.active]="todo.priority === priorities.Low"
+            (click)="changeTodoPriority(todo, priorities.Low)"
+            title="Niedrige Priorität">
+            L
+          </button>
+          <button 
+            class="mini-priority-btn priority-medium" 
+            [class.active]="todo.priority === priorities.Medium"
+            (click)="changeTodoPriority(todo, priorities.Medium)"
+            title="Mittlere Priorität">
+            M
+          </button>
+          <button 
+            class="mini-priority-btn priority-high" 
+            [class.active]="todo.priority === priorities.High"
+            (click)="changeTodoPriority(todo, priorities.High)"
+            title="Hohe Priorität">
+            H
+          </button>
+        </div>
         <button class="toggle-btn" (click)="toggleTodoCompletion(todo)">
           <span *ngIf="todo.completed">↩️ Wiederherstellen</span>
           <span *ngIf="!todo.completed">✓ Als erledigt markieren</span>
