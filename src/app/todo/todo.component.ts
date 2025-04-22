@@ -16,7 +16,7 @@ export class TodoComponent implements OnInit, DoCheck {
   filter: string = 'all';
   newTodoDueDate: string | null = null;
   newTodoHasNotification: boolean = false;
-  newTodoCategories: string[] = [];
+  newTodoCategory: string = '';
   public isBrowser: boolean;
   notificationPermissionGranted: boolean = false;
   
@@ -71,14 +71,14 @@ export class TodoComponent implements OnInit, DoCheck {
         completed: false,
         dueDate: dueDate,
         hasNotification: dueDate !== null && this.newTodoHasNotification,
-        categories: this.newTodoCategories.length > 0 ? [...this.newTodoCategories] : undefined
+        category: this.newTodoCategory || undefined
       };
 
       this.todos.push(todo);
       this.newTodo = '';
       this.newTodoDueDate = null;
       this.newTodoHasNotification = false;
-      this.newTodoCategories = [];
+      this.newTodoCategory = '';
       
       // Schedule notification if needed
       if (this.isBrowser && todo.hasNotification && todo.dueDate) {
@@ -211,9 +211,7 @@ export class TodoComponent implements OnInit, DoCheck {
 
     // Apply category filter if set
     if (this.categoryFilter) {
-      filtered = filtered.filter(todo => 
-        todo.categories && todo.categories.includes(this.categoryFilter!)
-      );
+      filtered = filtered.filter(todo => todo.category === this.categoryFilter);
     }
 
     return filtered;
@@ -246,48 +244,50 @@ export class TodoComponent implements OnInit, DoCheck {
     }
   }
 
-  // Toggle category selection for new todo
-  toggleCategory(category: string): void {
-    const index = this.newTodoCategories.indexOf(category);
-    if (index === -1) {
-      this.newTodoCategories.push(category);
-    } else {
-      this.newTodoCategories.splice(index, 1);
-    }
+  // Update todo category from dropdown selection
+  updateTodoCategory(todo: Todo, event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    todo.category = select.value || undefined;
+  }
+  
+  // Set category for new todo
+  setCategory(category: string): void {
+    this.newTodoCategory = category;
   }
 
-  // Check if a category is selected
+  // Check if a category is selected for new todo
   isCategorySelected(category: string): boolean {
-    return this.newTodoCategories.includes(category);
-  }
-
-  // Toggle category for existing todo
-  toggleTodoCategory(todo: Todo, category: string): void {
-    if (!todo.categories) {
-      todo.categories = [];
-    }
-
-    const index = todo.categories.indexOf(category);
-    if (index === -1) {
-      todo.categories.push(category);
-    } else {
-      todo.categories.splice(index, 1);
-    }
-
-    // Remove the categories array if it's empty
-    if (todo.categories.length === 0) {
-      todo.categories = undefined;
-    }
+    return this.newTodoCategory === category;
   }
 
   // Check if a todo has a specific category
   hasTodoCategory(todo: Todo, category: string): boolean {
-    return todo.categories?.includes(category) || false;
+    return todo.category === category;
   }
 
   // Filter todos by category
   filterByCategory(category: string | null): void {
     this.categoryFilter = category;
+  }
+
+  // Get todos by category for drag-drop lists
+  getTodosByCategory(category: string | null): Todo[] {
+    if (category === null) {
+      // For "uncategorized" list
+      return this.todos.filter(todo => !todo.category);
+    } else {
+      return this.todos.filter(todo => todo.category === category);
+    }
+  }
+
+  // Get todos by priority for drag-drop lists
+  getTodosByPriority(priority: 'high' | 'medium' | 'low' | null): Todo[] {
+    if (priority === null) {
+      // For todos without priority
+      return this.todos.filter(todo => !todo.priority);
+    } else {
+      return this.todos.filter(todo => todo.priority === priority);
+    }
   }
 }
 
