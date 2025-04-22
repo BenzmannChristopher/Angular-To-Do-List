@@ -140,11 +140,56 @@
             <div class="status-indicator" [class.done]="todo.completed"></div>
             <span class="status-text">{{ todo.completed ? 'Erledigt' : 'Offen' }}</span>
           </div>
+          <div class="header-due-date" *ngIf="todo.dueDate" [class.overdue]="isOverdue(todo)">
+            <span>Fällig: {{ formatDate(todo.dueDate) }}</span>
+          </div>
           <button class="delete-btn" (click)="removeTodo(todo.id)">✕</button>
         </div>
         
         <div class="card-content">
           <p [class.completed]="todo.completed">{{ todo.title }}</p>
+          
+          <!-- Subtasks Section -->
+          <div class="subtasks-section">
+            <!-- Subtask Progress -->
+            <div class="subtask-progress" *ngIf="todo.subtasks && todo.subtasks.length > 0">
+              <div class="progress-bar">
+                <div class="progress-fill" [style.width.%]="getSubtasksProgress(todo)"></div>
+              </div>
+              <span class="progress-text">{{ getCompletedSubtasksCount(todo) }}/{{ todo.subtasks.length }} erledigt</span>
+            </div>
+            
+            <!-- Subtasks List -->
+            <div class="subtasks-list" *ngIf="todo.subtasks && todo.subtasks.length > 0">
+              <div class="subtask-item" *ngFor="let subtask of todo.subtasks">
+                <div class="subtask-checkbox">
+                  <input 
+                    type="checkbox" 
+                    [checked]="subtask.completed" 
+                    (change)="toggleSubtaskCompleted(todo, subtask.id)">
+                </div>
+                <div class="subtask-title" [class.completed]="subtask.completed">
+                  {{ subtask.title }}
+                </div>
+                <button class="subtask-delete-btn" (click)="removeSubtask(todo, subtask.id)">✕</button>
+              </div>
+            </div>
+            
+            <!-- Add Subtask Form -->
+            <div class="add-subtask-form">
+              <input 
+                type="text" 
+                #subtaskInput
+                placeholder="Teilaufgabe hinzufügen" 
+                class="subtask-input"
+                (keyup.enter)="addSubtask(todo, subtaskInput.value); subtaskInput.value = ''">
+              <button 
+                class="add-subtask-btn" 
+                (click)="addSubtask(todo, subtaskInput.value); subtaskInput.value = ''">
+                +
+              </button>
+            </div>
+          </div>
           
           <!-- Categories Display -->
           <div class="todo-category" *ngIf="todo.category">
@@ -177,26 +222,20 @@
             </div>
           </div>
           
-          <!-- Due Date and Notification Controls -->
-          <div class="due-date-notification-container" *ngIf="todo.dueDate">
-            <div class="due-date" [class.overdue]="isOverdue(todo)">
-              <span class="due-date-label">Fällig:</span>
-              <span class="due-date-value">{{ formatDate(todo.dueDate) }}</span>
-              <div class="date-controls">
-                <div class="date-input-container">
-                  <input 
-                    type="datetime-local" 
-                    [ngModel]="todo.dueDate | date:'yyyy-MM-ddTHH:mm'" 
-                    (ngModelChange)="updateDueDate(todo)"
-                    name="todoDate"
-                    class="modern-date-input compact-date">
-                </div>
-              </div>
+          <!-- Date Editor & Notification Toggle -->
+          <div class="date-notification-compact" *ngIf="todo.dueDate">
+            <div class="date-input-container compact">
+              <input 
+                type="datetime-local" 
+                [ngModel]="todo.dueDate | date:'yyyy-MM-ddTHH:mm'" 
+                (ngModelChange)="updateDueDate(todo)"
+                name="todoDate"
+                class="modern-date-input compact-date">
             </div>
             
             <!-- Notification Toggle -->
-            <div class="notification-toggle" *ngIf="isBrowser">
-              <label class="notification-label">
+            <div class="notification-toggle-compact" *ngIf="isBrowser">
+              <label class="notification-label compact">
                 <i class="notification-icon">🔔</i>
                 <input 
                   type="checkbox" 
@@ -204,7 +243,6 @@
                   (change)="toggleNotification(todo)"
                   [disabled]="!todo.dueDate"
                   class="notification-checkbox">
-                <span>Benachrichtigung</span>
               </label>
             </div>
           </div>
