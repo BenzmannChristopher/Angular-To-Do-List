@@ -15,6 +15,19 @@
   --success-light: rgba(76, 175, 80, 0.2);
   --danger: #f44336;
   --danger-light: rgba(244, 67, 54, 0.2);
+  
+  /* Prioritätsfarben */
+  --priority-low-color: #8bc34a;
+  --priority-low-bg: rgba(139, 195, 74, 0.1);
+  --priority-low-border: rgba(139, 195, 74, 0.5);
+  
+  --priority-medium-color: #ff9800;
+  --priority-medium-bg: rgba(255, 152, 0, 0.1);
+  --priority-medium-border: rgba(255, 152, 0, 0.5);
+  
+  --priority-high-color: #f44336;
+  --priority-high-bg: rgba(244, 67, 54, 0.1);
+  --priority-high-border: rgba(244, 67, 54, 0.5);
 }
 
 html, body {
