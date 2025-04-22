@@ -1,0 +1,55 @@
+<div class="todo-container">
+  <div class="todo-header">
+    <h1>Meine Aufgaben</h1>
+    
+    <div class="filter-navbar">
+      <button (click)="filter = 'all'" [class.active]="filter === 'all'">Alle</button>
+      <button (click)="filter = 'open'" [class.active]="filter === 'open'">Offen</button>
+      <button (click)="filter = 'done'" [class.active]="filter === 'done'">Erledigt</button>
+    </div>
+  </div>
+  
+  <div class="input-group">
+    <input
+      type="text"
+      [(ngModel)]="newTodo"
+      placeholder="Neue Aufgabe hinzufügen..."
+      (keyup.enter)="addTodo()"
+    />
+    <button (click)="addTodo()">Hinzufügen</button>
+  </div>
+  
+  <div class="todo-status">
+    <p>{{ openTodosCount }} Aufgabe(n) offen</p>
+    
+    <button class="clear-btn" (click)="clearCompletedTodos()" *ngIf="hasCompletedTodos()">
+      Erledigte löschen
+    </button>
+  </div>
+</div>
+
+<div class="trello-board">
+  <div class="card-container">
+    <div class="trello-card" *ngFor="let todo of filteredTodos()" [class.completed-card]="todo.completed">
+      <div class="card-header" [class.completed]="todo.completed">
+        <div class="completion-status">
+          <span class="status-indicator" [class.done]="todo.completed"></span>
+          <span class="status-text">{{ todo.completed ? 'Erledigt' : 'Offen' }}</span>
+        </div>
+        <button class="delete-btn" (click)="removeTodo(todo.id)" title="Löschen">🗑️</button>
+      </div>
+      
+      <div class="card-content">
+        <p [class.completed]="todo.completed">{{ todo.title }}</p>
+      </div>
+      
+      <div class="card-footer">
+        <button class="toggle-btn" (click)="toggleTodoCompletion(todo)">
+          <span *ngIf="todo.completed">↩️ Wiederherstellen</span>
+          <span *ngIf="!todo.completed">✓ Als erledigt markieren</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  

@@ -1,0 +1,1 @@
+:host{display:block;height:100%;width:100%;overflow-y:auto;background-color:var(--bg-dark)}router-outlet{display:none}router-outlet+*{width:100%;height:100%;display:block}
